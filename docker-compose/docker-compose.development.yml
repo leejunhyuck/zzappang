@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: "zzappang"
+      RABBITMQ_DEFAULT_PASS: "password"
+    networks:
+      - zzappang-network
+  config:
+    image: zzappang/config
+    restart: on-failure
+    ports:
+      - 8888:8888
+    networks:
+      - zzappang-network
+  eureka:
+    image: zzappang/eureka
+    depends_on:
+      - config
+    restart: on-failure
+    environment:
+      CONFIG_SERVER_URI: "http://config:8888"
+    ports:
+      - 8761:8761
+    networks:
+      - zzappang-network
+
+networks:
+  zzappang-network:
+    external: true

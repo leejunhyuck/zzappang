@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: "gateway"
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_URI:http://localhost:8888}
+      fail-fast: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:192.168.137.19}
+    port: 5672
+    username: ${RABBITMQ_USERNAME:zzappang}
+    password: ${RABBITMQ_PASSWORD:password}
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URI:http://localhost:8761/eureka}
+    healthcheck:
+      enabled: true

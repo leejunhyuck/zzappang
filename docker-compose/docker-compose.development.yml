@@ -14,6 +14,10 @@ services:
   config:
     image: zzappang/config
     restart: on-failure
+    environment:
+      RABBITMQ_HOST: "rabbitmq"
+      RABBITMQ_USERNAME: "zzappang"
+      RABBITMQ_PASSWORD: "password"
     ports:
       - 8888:8888
     networks:
@@ -24,6 +28,9 @@ services:
       - config
     restart: on-failure
     environment:
+      RABBITMQ_HOST: "rabbitmq"
+      RABBITMQ_USERNAME: "zzappang"
+      RABBITMQ_PASSWORD: "password"
       CONFIG_SERVER_URI: "http://config:8888"
     ports:
       - 8761:8761

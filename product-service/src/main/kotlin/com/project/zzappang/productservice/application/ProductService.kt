@@ -9,6 +9,6 @@ interface ProductService {
     fun getProduct(productId: String): Mono<Product>
     fun recommendProduct(): Flux<Product>
     fun updateProduct(product: Mono<Product>): Mono<Product>
-    fun deleteProduct(productId: String)
+    fun deleteProduct(productId: String): Mono<Boolean>
     fun createProduct(product: Mono<Product>): Mono<Product>
 }

@@ -1,0 +1,8 @@
+spring:
+  data:
+    mongodb:
+      database: zzappang
+      username: zzappang
+      password: password
+      host: localhost
+      port: 27017

@@ -21,5 +21,4 @@ class ProductRouter(
             DELETE("/{id}", productHandler::deleteProduct)
         }
     }
-
 }

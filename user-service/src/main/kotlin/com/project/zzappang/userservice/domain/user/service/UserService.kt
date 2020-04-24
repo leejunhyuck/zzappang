@@ -5,8 +5,8 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface UserService {
-    fun getCustomer(id: Int): Mono<User>
+    fun getCustomer(id: String): Mono<User>
     fun createCustomer(user: Mono<User>): Mono<User>
-    fun deleteCustomer(id: Int): Mono<Boolean>
+    fun deleteCustomer(id: String): Mono<Boolean>
     fun searchCustomers(nameFilter: String): Flux<User>
 }

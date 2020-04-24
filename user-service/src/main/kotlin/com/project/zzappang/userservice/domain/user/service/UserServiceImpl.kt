@@ -13,10 +13,10 @@ class UserServiceImpl : UserService{
     @Autowired
     lateinit var repo: UserRepository
 
-    override fun getCustomer(id: Int): Mono<User> = repo.findById(id)
+    override fun getCustomer(id: String): Mono<User> = repo.findById(id)
 
     override fun createCustomer(user: Mono<User>): Mono<User> = repo.create(user)
-    override fun deleteCustomer(id: Int): Mono<Boolean> = repo.deleteById(id).map { it.deletedCount > 0 }
+    override fun deleteCustomer(id: String): Mono<Boolean> = repo.deleteById(id).map { it.deletedCount > 0 }
     override fun searchCustomers(nameFilter: String): Flux<User> = repo.findUser(nameFilter)
 
 

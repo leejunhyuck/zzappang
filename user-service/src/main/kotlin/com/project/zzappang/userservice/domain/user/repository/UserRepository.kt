@@ -14,8 +14,8 @@ import org.springframework.data.mongodb.core.find
 @Repository
 class UserRepository(private val template:ReactiveMongoTemplate) {
     fun create(user: Mono<User>) = template.save(user)
-    fun findById(id:Int)=template.findById<User>(id)
-    fun deleteById(id:Int)=template.remove<User>(Query(where("_id").isEqualTo(id)))
+    fun findById(id:String)=template.findById<User>(id)
+    fun deleteById(id:String)=template.remove<User>(Query(where("_id").isEqualTo(id)))
     fun findUser(nameFilter: String)=template.find<User>(
             Query(where("name").regex(".*$nameFilter.*","i"))
     )

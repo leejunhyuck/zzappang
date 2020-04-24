@@ -32,6 +32,7 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     implementation("io.jsonwebtoken:jjwt:0.9.0")
+    implementation("javax.xml.bind:jaxb-api:2.3.0")
 
     testImplementation("io.projectreactor:reactor-test")
 }

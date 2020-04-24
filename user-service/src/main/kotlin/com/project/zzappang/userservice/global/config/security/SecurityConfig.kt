@@ -1,54 +1,46 @@
 package com.project.zzappang.userservice.global.config.security
 
-import com.practice.concert_reservation_app.global.config.security.jwt.JwtConfig
-import com.practice.concert_reservation_app.global.config.security.jwt.JwtTokenProvider
-import com.practice.concert_reservation_app.global.config.security.userdetails.CustomUserDetailsService
-import com.project.zzappang.userservice.global.config.jwt.JwtConfig
-import com.project.zzappang.userservice.global.config.jwt.JwtTokenProvider
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
+import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.core.AuthenticationException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.web.server.ServerWebExchange
+import reactor.core.publisher.Mono
+
 
 @Configuration
-@EnableWebSecurity
-class SecurityConfig(
-        @Autowired
-        private val userDetailsService: CustomUserDetails,
-        @Autowired
-        private val bCryptPasswordEncoder: BCryptPasswordEncoder,
-        @Autowired
-        private val jwtTokenProvider: JwtTokenProvider
-) : WebSecurityConfigurerAdapter()
-{
+@EnableWebFluxSecurity
+class SecurityConfig {
+    @Autowired
+    private val authenticationManager: AuthenticationManager? = null
+
+    @Autowired
+    private val securityContextRepository: SecurityContextRepository? = null
+
     @Bean
-    override fun authenticationManagerBean(): AuthenticationManager {
-        return super.authenticationManagerBean()
-    }
-
-    override fun configure(http: HttpSecurity) {
-        http
-                .cors().disable()
+    fun springWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
+        val patterns = arrayOf("/userget/**")
+        return http.cors().disable()
                 .csrf().disable()
-                .antMatcher("/api/**").authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/api/v1/user/register").anonymous()
-                .antMatchers("/api/v1/user/login").anonymous()
-                .antMatchers("/api/v1/concerts").anonymous()
-                .anyRequest().authenticated()
+                .authenticationManager(authenticationManager)
+                .securityContextRepository(securityContextRepository)
+                .authorizeExchange()
+                .pathMatchers(*patterns).permitAll()
+                .pathMatchers(HttpMethod.OPTIONS).permitAll()
+                .anyExchange().authenticated()
                 .and()
-                .apply(JwtConfig(jwtTokenProvider))
+                .build()
     }
 
-    override fun configure(auth: AuthenticationManagerBuilder) {
-        auth
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(bCryptPasswordEncoder)
+    @Bean
+    fun passwordEncoder(): BCryptPasswordEncoder {
+        return BCryptPasswordEncoder()
     }
 }

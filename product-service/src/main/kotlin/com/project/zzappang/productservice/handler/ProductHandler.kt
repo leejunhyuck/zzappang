@@ -16,11 +16,11 @@ class ProductHandler(
         @Autowired private val productService: ProductService
 ) {
     fun getProducts(serverRequest: ServerRequest): Mono<ServerResponse> {
-        return ok().body(productService.getProducts())
+        return status(HttpStatus.OK).body(productService.getProducts())
     }
 
     fun getProduct(serverRequest: ServerRequest): Mono<ServerResponse> {
-        return ok().body(productService.getProduct(serverRequest.pathVariable("id")))
+        return status(HttpStatus.OK).body(productService.getProduct(serverRequest.pathVariable("id")))
     }
 
     fun createProduct(serverRequest: ServerRequest): Mono<ServerResponse> {
@@ -28,12 +28,12 @@ class ProductHandler(
     }
 
     fun updateProduct(serverRequest: ServerRequest): Mono<ServerResponse> {
-        return ok().body(productService.updateProduct(serverRequest.bodyToMono()))
+        return status(HttpStatus.OK).body(productService.updateProduct(serverRequest.bodyToMono()))
     }
 
     fun deleteProduct(serverRequest: ServerRequest): Mono<ServerResponse> {
         return productService.deleteProduct(serverRequest.pathVariable("id")).flatMap {
-            noContent().build()
+            status(HttpStatus.NO_CONTENT).build()
         }
     }
 }

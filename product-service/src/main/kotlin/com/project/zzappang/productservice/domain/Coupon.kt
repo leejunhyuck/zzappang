@@ -1,12 +1,13 @@
 package com.project.zzappang.productservice.domain
 
-import org.bson.types.ObjectId
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
 @Document(value = "coupons")
 data class Coupon(
-        var _id: ObjectId? = null,
+        @Id
+        var _id: String? = null,
         var categoryId: String,
         var name: String,
         var discount: Int,

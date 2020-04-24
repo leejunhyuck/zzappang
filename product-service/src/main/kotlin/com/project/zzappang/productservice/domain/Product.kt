@@ -1,11 +1,12 @@
 package com.project.zzappang.productservice.domain
 
-import org.bson.types.ObjectId
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(value = "products")
 data class Product(
-        var _id: ObjectId? = null,
+        @Id
+        var _id: String? = null,
         var imageIds: List<String>,
         var title: String,
         var content: String,

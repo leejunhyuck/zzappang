@@ -15,6 +15,8 @@ class CategoryRouter(
     fun categoryRoutes(): RouterFunction<*> = router {
         "/categories".nest {
             GET("/", categoryHandler::getCategories)
+            GET("/{id}/siblings", categoryHandler::getSiblingCategories)
+            GET("/recommend", categoryHandler::recommendCategories)
         }
     }
 }

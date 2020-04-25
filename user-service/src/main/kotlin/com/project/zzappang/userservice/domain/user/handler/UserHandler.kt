@@ -24,17 +24,6 @@ class UserHandler(
         val tokenProvider: JwtTokenProvider,
         val tempRepository : TempRepository
 ) {
-    fun gettoken(serverRequest: ServerRequest) = tempRepository.findById(serverRequest.pathVariable("id"))
-            //.flatMap { ok().body(fromObject(it))}
-            .flatMap {
-                print(it)
-                ok().body(BodyInserters.fromObject(UserResponse(tokenProvider.generateToken(it))))}
-            .switchIfEmpty(status(HttpStatus.NOT_FOUND).build())
-
-    fun login(serverRequest: ServerRequest) = tempRepository.findById(serverRequest.pathVariable("id"))
-            .flatMap { ok().body(fromObject(it!!))}
-            .switchIfEmpty(status(HttpStatus.NOT_FOUND).build())
-
     fun get(serverRequest: ServerRequest) = tempRepository.findById(serverRequest.pathVariable("id"))
             //.flatMap { ok().body(fromObject(it))}
             .flatMap {

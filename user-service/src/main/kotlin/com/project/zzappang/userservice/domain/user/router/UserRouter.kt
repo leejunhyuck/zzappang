@@ -1,5 +1,6 @@
 package com.project.zzappang.userservice.domain.user.router
 
+import com.project.zzappang.userservice.domain.user.handler.AuthHandler
 import com.project.zzappang.userservice.domain.user.handler.UserHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.security.core.parameters.P
@@ -7,12 +8,11 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.router
 
 @Component
-class UserRouter(private val userHandler: UserHandler) {
+class UserRouter(private val userHandler: UserHandler,private val authHandler: AuthHandler) {
     @Bean
     fun customerRoutes() = router {
         "/user".nest {
             GET("/{id}", userHandler::get)
-            POST("/{id}", userHandler::login)
             POST("/", userHandler::create)
             DELETE("/{id}", userHandler::delete)
         }
@@ -20,14 +20,12 @@ class UserRouter(private val userHandler: UserHandler) {
             GET("/", userHandler::search)
         }
         "/userget".nest {
-            GET("/{id}" , userHandler::gettoken)
+            GET("/{id}" , authHandler::signUp)
         }
 
         "/auth".nest{
-            GET("/{id}", userHandler::get)
-            POST("/{id}", userHandler::login)
-            POST("/", userHandler::create)
-            DELETE("/{id}", userHandler::delete)
+            POST("/{id}", authHandler::signUp)
+            POST("/{id}", authHandler::signIn)
         }
     }
 }

@@ -9,4 +9,5 @@ interface UserService {
     fun createCustomer(user: Mono<User>): Mono<User>
     fun deleteCustomer(id: String): Mono<Boolean>
     fun searchCustomers(nameFilter: String): Flux<User>
+    fun signUp(user: Mono<User>): Mono<User>
 }

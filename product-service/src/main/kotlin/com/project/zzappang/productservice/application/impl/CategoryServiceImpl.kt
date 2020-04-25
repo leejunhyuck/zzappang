@@ -11,8 +11,12 @@ import reactor.core.publisher.Flux
 class CategoryServiceImpl(
         @Autowired private val categoryRepository: CategoryRepository
 ): CategoryService {
-    override fun getCategories(): Flux<Category> {
-        return categoryRepository.findAll()
+    override fun getCategories(q: String): Flux<Category> {
+        return categoryRepository.findByNameContaining(q)
+    }
+
+    override fun getSiblingCategories(categoryId: String): Flux<Category> {
+        return categoryRepository.findByParentCategoryId(categoryId)
     }
 
     override fun recommendCategories(): Flux<Category> {

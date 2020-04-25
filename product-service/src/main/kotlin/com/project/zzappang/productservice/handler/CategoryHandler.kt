@@ -14,6 +14,17 @@ class CategoryHandler(
         @Autowired private val categoryService: CategoryService
 ) {
     fun getCategories(serverRequest: ServerRequest): Mono<ServerResponse> {
-        return ServerResponse.status(HttpStatus.OK).body(categoryService.getCategories())
+        return ServerResponse.status(HttpStatus.OK)
+                .body(categoryService.getCategories(serverRequest.queryParam("q").orElse("")))
+    }
+
+    fun getSiblingCategories(serverRequest: ServerRequest): Mono<ServerResponse> {
+        return ServerResponse.status(HttpStatus.OK)
+                .body(categoryService.getSiblingCategories(serverRequest.pathVariable("id")))
+    }
+
+    fun recommendCategories(serverRequest: ServerRequest): Mono<ServerResponse> {
+        return ServerResponse.status(HttpStatus.OK)
+                .body(categoryService.recommendCategories())
     }
 }

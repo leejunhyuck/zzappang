@@ -10,4 +10,8 @@ data class Category(
         var name: String,
         var level: Int,
         var parentCategoryId: String? = null
-)
+) {
+        fun isSiblingOf(category: Category) : Boolean {
+                return this.parentCategoryId == category._id
+        }
+}

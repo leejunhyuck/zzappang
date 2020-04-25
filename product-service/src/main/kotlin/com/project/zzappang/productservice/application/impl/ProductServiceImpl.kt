@@ -1,9 +1,11 @@
 package com.project.zzappang.productservice.application.impl
 
+import com.project.zzappang.productservice.application.CategoryService
 import com.project.zzappang.productservice.application.ProductService
 import com.project.zzappang.productservice.domain.Product
 import com.project.zzappang.productservice.dto.ProductDto
 import com.project.zzappang.productservice.exception.CouponNotFoundException
+import com.project.zzappang.productservice.exception.InvalidCategorySetException
 import com.project.zzappang.productservice.exception.ProductNotFoundException
 import com.project.zzappang.productservice.repository.ProductRepository
 import org.bson.types.ObjectId
@@ -15,7 +17,8 @@ import reactor.kotlin.core.publisher.switchIfEmpty
 
 @Service
 class ProductServiceImpl(
-    @Autowired private val productRepository: ProductRepository
+    @Autowired private val productRepository: ProductRepository,
+    @Autowired private val categoryService: CategoryService
 ): ProductService {
     override fun getProducts(): Flux<Product> {
         return productRepository.findAll()
@@ -42,7 +45,11 @@ class ProductServiceImpl(
     }
 
     override fun createProduct(product: Mono<Product>): Mono<Product> {
-        return product.flatMap { productRepository.save(it) }
+        return product.flatMap {product ->
+            categoryService.isValidCategorySet(product.categories).flatMap {
+                if (it) productRepository.save(product)
+                else throw InvalidCategorySetException("invalid category set")
+            }
+        }
     }
-
 }

@@ -1,6 +1,6 @@
 package com.project.zzappang.userservice.domain.user.handler
 
-import com.project.zzappang.userservice.domain.user.dto.UserResponse
+import com.project.zzappang.userservice.domain.user.dto.SignInResponse
 import com.project.zzappang.userservice.domain.user.model.User
 import com.project.zzappang.userservice.domain.user.repository.TempRepository
 import com.project.zzappang.userservice.domain.user.service.UserService
@@ -8,7 +8,6 @@ import com.project.zzappang.userservice.global.config.jwt.JwtTokenProvider
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
-import org.springframework.web.reactive.function.BodyInserters.fromObject
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.*
@@ -21,19 +20,19 @@ import java.net.URI
 @Component
 class UserHandler(
         val userService: UserService,
-        val tokenProvider: JwtTokenProvider,
-        val tempRepository : TempRepository
+        val tempRepository : TempRepository,
+        val tokenProvider: JwtTokenProvider
 ) {
     fun get(serverRequest: ServerRequest) = tempRepository.findById(serverRequest.pathVariable("id"))
             //.flatMap { ok().body(fromObject(it))}
             .flatMap {
                 print(it)
-                ok().body(BodyInserters.fromObject(UserResponse(tokenProvider.generateToken(it))))}
+                ok().body(BodyInserters.fromObject(SignInResponse(it!!.name,tokenProvider.generateToken(it))))}
             .switchIfEmpty(status(HttpStatus.NOT_FOUND).build())
 
     fun get1(serverRequest: ServerRequest) = userService.getCustomer(serverRequest.pathVariable("id"))
             //.flatMap { ok().body(fromObject(it))}
-            .flatMap {user -> ok().body(BodyInserters.fromObject(UserResponse(tokenProvider.generateToken(user))))}
+            .flatMap {user -> ok().body(BodyInserters.fromObject(SignInResponse(user.name,tokenProvider.generateToken(user))))}
             .switchIfEmpty(status(HttpStatus.NOT_FOUND).build())
 
     fun create(serverRequest: ServerRequest) : Mono<ServerResponse> = userService.createCustomer(serverRequest.bodyToMono()).flatMap {

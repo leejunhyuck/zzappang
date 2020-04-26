@@ -17,17 +17,15 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 
 @Component
 class AuthHandler(
-        val userService: UserService,
-        val tokenProvider: JwtTokenProvider,
-        val tempRepository: TempRepository
+        val userService: UserService
 ) {
     fun signUp(serverRequest: ServerRequest): Mono<ServerResponse> = userService.signUp(serverRequest.bodyToMono())
             .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it!!)) }
             .switchIfEmpty(ServerResponse.status(HttpStatus.OK).build())
 
-    fun signIn(serverRequest: ServerRequest) = tempRepository.findById(serverRequest.pathVariable("id"))
+    fun signIn(serverRequest: ServerRequest) = userService.signIn(serverRequest.bodyToMono())
             .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it!!)) }
-            .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_FOUND).build())
+            .switchIfEmpty(ServerResponse.status(HttpStatus.OK).build())
 
 
 }

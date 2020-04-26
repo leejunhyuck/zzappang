@@ -3,12 +3,10 @@ package com.project.zzappang.orderservice.domain
 data class Order(
     var _id: String,
     var productId: String,
+    var quantity: Int,
     var state: OrderState,
     var userId: String,
     var receiverInfo: ReceiverInfo,
-    var couponId: String?,
-    var totalPrice: Int,
-    var totalPayment: Int,
     var paymentType: PaymentType
 )
 

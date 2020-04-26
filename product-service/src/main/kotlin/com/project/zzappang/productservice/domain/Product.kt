@@ -10,6 +10,7 @@ data class Product(
         var imageIds: List<String>,
         var title: String,
         var content: String,
+        var price: Int,
         var thumbnailImageId: String,
         var categories: CategorySet,
         var seller_id: String,

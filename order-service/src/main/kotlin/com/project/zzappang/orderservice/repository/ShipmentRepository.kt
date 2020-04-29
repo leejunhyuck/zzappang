@@ -8,5 +8,5 @@ import reactor.core.publisher.Mono
 
 interface ShipmentRepository : ReactiveCrudRepository<Shipment, String> {
     fun findByType(type: ShipmentType): Flux<Shipment>
-    fun findByOrderId(orderId: String): Mono<Shipment>
+    fun findByOrderIdAndType(orderId: String, type: ShipmentType): Mono<Shipment>
 }

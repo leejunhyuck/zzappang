@@ -1,6 +1,7 @@
 package com.project.zzappang.orderservice.handler
 
 import com.project.zzappang.orderservice.application.ShipmentService
+import com.project.zzappang.orderservice.domain.ShipmentType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -16,6 +17,11 @@ class ShipmentHandler(
 ) {
     fun getShipments(serverRequest: ServerRequest): Mono<ServerResponse> {
         val userId = serverRequest.headers().firstHeader("userId") ?: return status(HttpStatus.UNAUTHORIZED).build()
-        return status(HttpStatus.OK).body(shipmentService.getShipments(Mono.just(userId)))
+        val shipmentType = ShipmentType.valueOf(serverRequest.queryParam("type").orElse("NORMAL"))
+        return status(HttpStatus.OK)
+            .body(shipmentService.getShipments(
+                Mono.just(userId),
+                Mono.just(shipmentType)
+            ))
     }
 }

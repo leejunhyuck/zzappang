@@ -16,6 +16,7 @@ class OrderRouter(
         "/orders".nest {
             GET("/", orderHandler::getOrders)
             POST("/", orderHandler::placeOrder)
+            POST("/{id}/shipment_start", orderHandler::startShipment)
         }
     }
 }

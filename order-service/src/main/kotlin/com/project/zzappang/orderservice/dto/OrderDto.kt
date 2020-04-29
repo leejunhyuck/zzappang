@@ -2,6 +2,7 @@ package com.project.zzappang.orderservice.dto
 
 import com.project.zzappang.orderservice.domain.PaymentType
 import com.project.zzappang.orderservice.domain.ReceiverInfo
+import com.project.zzappang.orderservice.domain.ShipmentType
 
 class OrderDto {
     data class PlaceOrderReq(
@@ -13,6 +14,7 @@ class OrderDto {
 
     data class ProductInfo(
         var productId: String,
-        var quantity: Int
+        var quantity: Int,
+        var type: ShipmentType
     )
 }

@@ -22,4 +22,12 @@ class ShipmentServiceImpl(
             }
         }
     }
+
+    override fun initializeShipment(orderId: Mono<String>, type: Mono<ShipmentType>): Mono<Void> {
+        return orderId.flatMap {orderId ->
+            type.flatMap { type ->
+                shipmentRepository.save(Shipment.of(type, orderId)).then()
+            }
+        }
+    }
 }

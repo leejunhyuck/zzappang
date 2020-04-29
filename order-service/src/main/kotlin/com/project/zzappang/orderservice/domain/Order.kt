@@ -2,6 +2,7 @@ package com.project.zzappang.orderservice.domain
 
 import com.project.zzappang.orderservice.dto.OrderDto
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 data class Order(
     var _id: String? = null,
@@ -13,17 +14,15 @@ data class Order(
     var paymentType: PaymentType
 ) {
     companion object {
-        fun of(placeOrderReq: OrderDto.PlaceOrderReq, userId: String): Flux<Order> {
-            return Flux.fromIterable(placeOrderReq.productInfos.map {
-                Order(
-                    productId = it.productId,
-                    quantity = it.quantity,
+        fun of(productInfo: OrderDto.ProductInfo, receiverInfo: ReceiverInfo, paymentType: PaymentType, userId: String): Order {
+            return Order(
+                    productId = productInfo.productId,
+                    quantity = productInfo.quantity,
                     state = OrderState.IN_PROGRESS,
                     userId = userId,
-                    receiverInfo = placeOrderReq.receiverInfo,
-                    paymentType = placeOrderReq.paymentType
-                )
-            })
+                    receiverInfo = receiverInfo,
+                    paymentType = paymentType
+            )
         }
     }
 }

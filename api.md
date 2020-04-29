@@ -54,6 +54,12 @@ type
 ### 3. GET /returns/
 나의 반품 목록
 
+### 4. POST /orders/{id}/shipment_start
+(판매자용) 해당 주문 배송 시작
+
+### 5. POST /orders/{id}/shipment_end
+(판매자용) 해당 주문 배송 완료
+
 ## user&product-service
 
 ### 1. GET /likes/

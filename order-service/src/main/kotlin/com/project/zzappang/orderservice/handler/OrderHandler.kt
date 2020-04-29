@@ -26,4 +26,12 @@ class OrderHandler(
             status(HttpStatus.NO_CONTENT).build()
         }
     }
+
+    fun startShipment(serverRequest: ServerRequest): Mono<ServerResponse> {
+        val userId = serverRequest.headers().firstHeader("userId") ?: return status(HttpStatus.UNAUTHORIZED).build()
+        val orderId = serverRequest.pathVariable("id")
+        return orderService.startShipment(Mono.just(userId), Mono.just(orderId)).flatMap {
+            status(HttpStatus.NO_CONTENT).build()
+        }
+    }
 }

@@ -21,6 +21,14 @@ data class Shipment(
             )
         }
     }
+
+    fun startShipment() {
+        this.state = ShipmentState.IN_PROGRESS
+    }
+
+    fun completeShipment() {
+        this.state = ShipmentState.COMPLETED
+    }
 }
 
 enum class Term {

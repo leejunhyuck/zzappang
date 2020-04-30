@@ -24,7 +24,7 @@ class OrderServiceImpl(
         return placeOrderReq.flatMapMany {
             Flux.fromIterable(it.productInfos.map { productInfo ->
                 val order = Order.of(productInfo, it.receiverInfo, it.paymentType, userId)
-                orderRepository.save(order).flatMap {order ->
+                orderRepository.save(order).flatMap { order ->
                     shipmentService.initializeShipment(Mono.just(order._id!!), Mono.just(productInfo.type))
                 }
             })
@@ -32,5 +32,26 @@ class OrderServiceImpl(
     }
 
     override fun startShipment(userId: Mono<String>, orderId: Mono<String>): Mono<Void> {
+        val shipment = orderId.flatMap {
+            orderRepository.findById(it).flatMap { order ->
+                shipmentService.getShipmentByOrderId(Mono.just(order._id!!))
+            }
+        }
+
+        return shipment.map {
+            it.startShipment()
+        }.then()
+    }
+
+    override fun endShipment(userId: Mono<String>, orderId: Mono<String>): Mono<Void> {
+        val shipment = orderId.flatMap {
+            orderRepository.findById(it).flatMap { order ->
+                shipmentService.getShipmentByOrderId(Mono.just(order._id!!))
+            }
+        }
+
+        return shipment.map {
+            it.completeShipment()
+        }.then()
     }
 }

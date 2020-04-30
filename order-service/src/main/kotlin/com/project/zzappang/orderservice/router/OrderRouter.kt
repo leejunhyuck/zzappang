@@ -17,6 +17,7 @@ class OrderRouter(
             GET("/", orderHandler::getOrders)
             POST("/", orderHandler::placeOrder)
             POST("/{id}/shipment_start", orderHandler::startShipment)
+            POST("/{id}/shipment_end", orderHandler::endShipment)
         }
     }
 }

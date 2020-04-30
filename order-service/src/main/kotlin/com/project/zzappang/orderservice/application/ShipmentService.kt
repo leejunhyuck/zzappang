@@ -7,5 +7,6 @@ import reactor.core.publisher.Mono
 
 interface ShipmentService {
     fun getShipments(userId: Mono<String>, type: Mono<ShipmentType>): Flux<Shipment>
+    fun getShipmentByOrderId(orderId: Mono<String>): Mono<Shipment>
     fun initializeShipment(orderId: Mono<String>, type: Mono<ShipmentType>): Mono<Void>
 }

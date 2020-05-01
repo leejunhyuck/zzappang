@@ -17,7 +17,8 @@ interface UserService {
 
     fun signUp(user: Mono<SignUpRequest>): Mono<User>
     fun signIn(user: Mono<SignInRequest>): Mono<Any>
-    fun getMyinfo()// 수정
+    fun getMyinfo(): Mono<Any>// 수정
     fun registerMembership(request: Mono<Any>): Mono<Membership>
     fun unregisterMembership(request: Mono<Any>): Mono<DeleteResult>
+    fun verifyUser(request: Mono<SignInRequest>): Mono<User>
 }

@@ -58,5 +58,6 @@ class UserHandler(
     fun registerMembership(serverRequest: ServerRequest)  = userService.registerMembership(serverRequest.bodyToMono()).flatMap{ok().build()}
     fun unregisterMembership(serverRequest: ServerRequest) = userService.unregisterMembership(serverRequest.bodyToMono()).flatMap { ok().build()}
     fun getMyinfo(serverRequest: ServerRequest) = userService.getMyinfo().flatMap { ok().build() }
+    fun verifyUser(serverRequest: ServerRequest) = userService.verifyUser(serverRequest.bodyToMono()).flatMap { ok().build()}
 }
 

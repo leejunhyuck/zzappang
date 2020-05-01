@@ -21,6 +21,7 @@ class UserRouter(private val userHandler: UserHandler,private val authHandler: A
         }
         "/user".nest{
             GET("/me", userHandler::getMyinfo)
+            POST("/verify", userHandler::verifyUser)
         }
 
         "/auth".nest{

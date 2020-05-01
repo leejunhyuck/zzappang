@@ -13,7 +13,9 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToFlux
+import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -24,11 +26,11 @@ class UserServiceImpl(
         val passwordEncoder: BCryptPasswordEncoder,
         val repo: UserRepository,
         val tokenProvider: JwtTokenProvider,
-        val restTemplate: RestTemplate
+        var webClient: WebClient
 ) : UserService {
     private val PRODUCT_SERVICE_API = "/coupons/"
     private val ORDER_SERVICE_API = "/shipments/"
-    private val MILEAGE_SERVICE_API =  "/mileages/"
+    private val MILEAGE_SERVICE_API = "/mileages/"
 
 
     override fun getCustomer(id: String): Mono<User> = repo.findById(id)
@@ -48,39 +50,63 @@ class UserServiceImpl(
             }
 
 
-    override fun signIn(req: Mono<SignInRequest>): Mono<Any> {
-        return req.flatMap { login ->
-            repo.findById(login.id).flatMap { user ->
-                if (passwordEncoder.matches(login.password, user.password))
-                    SignInRequest(user.name, tokenProvider.generateToken(user)).toMono()
-                else
-                    user.toMono() // 전역 예외 처리 하기
+    override fun signIn(req: Mono<SignInRequest>): Mono<Any> =
+            req.flatMap { login ->
+                repo.findById(login.id).flatMap { user ->
+                    if (passwordEncoder.matches(login.password, user.password))
+                        SignInRequest(user.name, tokenProvider.generateToken(user)).toMono()
+                    else
+                        user.toMono() // 전역 예외 처리 하기
+                }
             }
-        }
+
+
+    override fun getMyinfo(): Mono<Any> {
+        var auth = ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName)
+        var list = ArrayList<String>()
+
+        var orders = WebClient.create().get().uri(ORDER_SERVICE_API).header("authorization", auth.subscribe().toString())
+                .retrieve().bodyToMono(String.javaClass)
+
+        orders.subscribe { list.add(it.toString()) }
+
+        var coupons = WebClient.create().get().uri(MILEAGE_SERVICE_API).header("authorization", auth.subscribe().toString())
+                .retrieve().bodyToMono(String.javaClass)
+
+        coupons.subscribe { list.add(it.toString()) }
+
+        return list.toMono()
+
     }
 
-    override fun getMyinfo() {
-        ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName).flatMap {
-            var ackMessage = restTemplate.getForEntity("http://$PRODUCT_SERVICE_API", String::class.java) //전역 예외 처리하기
-            ackMessage.body.toMono()
-    }}
 
+    override fun registerMembership(req: Mono<Any>): Mono<Membership> =
+            ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName).flatMap {
+                it
+                repo.registerMembership(Membership(it, true))
+                        .switchIfEmpty(Membership("id", true).toMono()) //전역 예외 처리하기
+            }
 
-    override fun registerMembership(req:Mono<Any>): Mono<Membership> =
-        ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName).flatMap {it
-            repo.registerMembership(Membership(it, true))
-                    .switchIfEmpty(Membership("id",true).toMono()) //전역 예외 처리하기
-    }
-
-    override fun unregisterMembership(req:Mono<Any>): Mono<DeleteResult> =
-            ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName).flatMap {it
+    override fun unregisterMembership(req: Mono<Any>): Mono<DeleteResult> =
+            ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName).flatMap {
+                it
                 repo.unregisterMembership(it)
                         .switchIfEmpty(repo.unregisterMembership(it)) //전역 예외 처리하기
             }
 
-
-
+    override fun verifyUser(req: Mono<SignInRequest>): Mono<User> = //dto 바꿔야하나?
+            ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName).flatMap {
+                req.flatMap { login ->
+                    repo.findById(login.id).flatMap { user ->
+                        if (passwordEncoder.matches(login.password, user.password))
+                            user.toMono()
+                        else
+                            user.toMono() // 전역 예외 처리 하기
+                    }
+                }
+            }
 }
+
 
 
 

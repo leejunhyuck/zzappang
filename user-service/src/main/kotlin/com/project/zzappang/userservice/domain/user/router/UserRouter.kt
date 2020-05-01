@@ -19,13 +19,18 @@ class UserRouter(private val userHandler: UserHandler,private val authHandler: A
         "/user".nest {
             GET("/", userHandler::search)
         }
-        "/userget".nest {
-            GET("/{id}" , authHandler::signUp)
+        "/user".nest{
+            GET("/me", userHandler::getMyinfo)
         }
 
         "/auth".nest{
-            POST("/{id}", authHandler::signUp)
-            POST("/{id}", authHandler::signIn)
+            POST("/signup", authHandler::signUp)
+            POST("/signin", authHandler::signIn)
+        }
+
+        "/membership".nest{
+            POST("/register", userHandler::registerMembership)
+            POST("/unregister", userHandler::unregisterMembership)
         }
     }
 }

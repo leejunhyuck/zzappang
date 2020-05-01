@@ -1,14 +1,19 @@
 package com.project.zzappang.userservice.domain.user.service
 
+import com.mongodb.client.result.DeleteResult
 import com.project.zzappang.userservice.domain.user.dto.SignInRequest
-import com.project.zzappang.userservice.domain.user.dto.SignInResponse
 import com.project.zzappang.userservice.domain.user.dto.SignUpRequest
+import com.project.zzappang.userservice.domain.user.model.Membership
 import com.project.zzappang.userservice.domain.user.model.Role
 import com.project.zzappang.userservice.domain.user.model.User
 import com.project.zzappang.userservice.domain.user.repository.UserRepository
 import com.project.zzappang.userservice.global.config.jwt.JwtTokenProvider
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.ReactiveSecurityContextHolder
+import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -18,8 +23,12 @@ import reactor.kotlin.core.publisher.toMono
 class UserServiceImpl(
         val passwordEncoder: BCryptPasswordEncoder,
         val repo: UserRepository,
-        val tokenProvider: JwtTokenProvider
+        val tokenProvider: JwtTokenProvider,
+        val restTemplate: RestTemplate
 ) : UserService {
+    private val PRODUCT_SERVICE_API = "/coupons/"
+    private val ORDER_SERVICE_API = "/shipments/"
+    private val MILEAGE_SERVICE_API =  "/mileages/"
 
 
     override fun getCustomer(id: String): Mono<User> = repo.findById(id)
@@ -43,12 +52,34 @@ class UserServiceImpl(
         return req.flatMap { login ->
             repo.findById(login.id).flatMap { user ->
                 if (passwordEncoder.matches(login.password, user.password))
-                    return@flatMap SignInRequest(user.name, tokenProvider.generateToken(user)).toMono()
+                    SignInRequest(user.name, tokenProvider.generateToken(user)).toMono()
                 else
-                    return@flatMap user.toMono() // 전역 예외 처리 하기
+                    user.toMono() // 전역 예외 처리 하기
             }
         }
     }
+
+    override fun getMyinfo() {
+        ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName).flatMap {
+            var ackMessage = restTemplate.getForEntity("http://$PRODUCT_SERVICE_API", String::class.java) //전역 예외 처리하기
+            ackMessage.body.toMono()
+    }}
+
+
+    override fun registerMembership(req:Mono<Any>): Mono<Membership> =
+        ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName).flatMap {it
+            repo.registerMembership(Membership(it, true))
+                    .switchIfEmpty(Membership("id",true).toMono()) //전역 예외 처리하기
+    }
+
+    override fun unregisterMembership(req:Mono<Any>): Mono<DeleteResult> =
+            ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getName).flatMap {it
+                repo.unregisterMembership(it)
+                        .switchIfEmpty(repo.unregisterMembership(it)) //전역 예외 처리하기
+            }
+
+
+
 }
 
 

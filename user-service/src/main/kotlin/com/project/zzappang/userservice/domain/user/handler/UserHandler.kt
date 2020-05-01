@@ -55,5 +55,8 @@ class UserHandler(
 
     fun geta(serverRequest: ServerRequest) = ServerResponse.ok().body("hello world".toMono(),String::class.java)
 
+    fun registerMembership(serverRequest: ServerRequest)  = userService.registerMembership(serverRequest.bodyToMono()).flatMap{ok().build()}
+    fun unregisterMembership(serverRequest: ServerRequest) = userService.unregisterMembership(serverRequest.bodyToMono()).flatMap { ok().build()}
+    fun getMyinfo(serverRequest: ServerRequest) = userService.getMyinfo().flatMap { ok().build() }
 }
 

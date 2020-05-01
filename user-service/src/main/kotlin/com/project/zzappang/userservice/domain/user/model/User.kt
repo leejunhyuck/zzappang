@@ -9,14 +9,15 @@ import javax.validation.constraints.Email
 @JsonIgnoreProperties(value = ["password"])
 data class User(
         @Id
-        var id: String = "",
-        var password: String = "",
-        var name: String = "",
+        var id: String,
+        var password: String,
+        var name: String,
         @Email
-        var email: String = "",
-        var address: String = "",
-        var couponIds: String = "",
-        var phone: String = "",
+        var email: String,
+        var address: String,
+        var couponIds: String,
+        var phone: String,
+        var money: Long,
         var roles: List<Role>
 
 )
